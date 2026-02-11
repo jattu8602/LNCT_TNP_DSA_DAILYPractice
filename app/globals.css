@@ -24,6 +24,9 @@
 /* Import profile page styles */
 @import './profile-styles.css';
 
+/* Import nav footer animation */
+@import './nav-animation.css';
+
 
 :root {
   --color-primary: #ff6b35;
@@ -750,7 +753,8 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  overflow-y: auto;
+  overflow: visible;
+  /* Allow items to extend on hover */
 }
 
 .nav-item {
@@ -842,19 +846,16 @@ body::before {
 /* WhatsApp-style oval indicator */
 .bottom-nav-item-active {
   color: #667eea;
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: 50px;
+  /* Oval/pill shape like WhatsApp */
+  padding: 0.75rem 1.25rem;
+  /* Extra horizontal padding for oval shape */
 }
 
 .bottom-nav-item-active::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 70%;
-  height: 85%;
-  background: rgba(102, 126, 234, 0.15);
-  border-radius: 24px;
-  z-index: -1;
+  display: none;
+  /* Remove the old background */
 }
 
 .bottom-nav-item svg {

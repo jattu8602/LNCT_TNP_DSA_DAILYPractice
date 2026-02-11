@@ -27,62 +27,136 @@ export default function CodeCanvas({ file, index, isPinned, onPinToggle }: CodeC
     year: 'numeric',
   });
 
-  // Simplified syntax highlighting that works correctly
+  // Completely rewritten syntax highlighting using position-based approach
   const highlightJava = (line: string) => {
-    // Escape HTML
-    let html = line
+    // Escape HTML first
+    const escaped = line
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
 
-    // Store original to compare
-    const patterns = [
-      // Comments - highest priority
-      {
-        regex: /\/\/.*$/g,
-        replacement: (match: string) => `<span class="syntax-comment">${match}</span>`
-      },
-      {
-        regex: /\/\*[\s\S]*?\*\//g,
-        replacement: (match: string) => `<span class="syntax-comment">${match}</span>`
-      },
-      // Strings
-      {
-        regex: /"(?:[^"\\]|\\.)*"/g,
-        replacement: (match: string) => `<span class="syntax-string">${match}</span>`
-      },
-      {
-        regex: /'(?:[^'\\]|\\.)*'/g,
-        replacement: (match: string) => `<span class="syntax-string">${match}</span>`
-      },
-      // Annotations
-      {
-        regex: /@\w+/g,
-        replacement: (match: string) => `<span class="syntax-annotation">${match}</span>`
-      },
-      // Keywords
-      {
-        regex: /\b(public|private|protected|static|final|class|interface|extends|implements|void|int|double|float|long|short|byte|char|boolean|String|if|else|while|for|return|new|this|super|try|catch|finally|throw|throws|import|package|Stack|Character)\b/g,
-        replacement: (match: string) => `<span class="syntax-keyword">${match}</span>`
-      },
-      // Function calls (word before opening paren)
-      {
-        regex: /\b(\w+)(?=\s*\()/g,
-        replacement: (match: string) => `<span class="syntax-function">${match}</span>`
-      },
-      // Numbers
-      {
-        regex: /\b\d+\.?\d*\b/g,
-        replacement: (match: string) => `<span class="syntax-number">${match}</span>`
-      }
-    ];
+    // Find all matches with their positions
+    interface Match {
+      start: number;
+      end: number;
+      text: string;
+      className: string;
+      priority: number;
+    }
 
-    // Apply each pattern
-    patterns.forEach(({ regex, replacement }) => {
-      html = html.replace(regex, replacement);
+    const matches: Match[] = [];
+
+    // Priority: 1 = highest (comments/strings), 5 = lowest (numbers)
+
+    // Comments (priority 1)
+    const commentRegex = /\/\/.*$|\/\*[\s\S]*?\*\//g;
+    let match;
+    while ((match = commentRegex.exec(escaped)) !== null) {
+      matches.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        text: match[0],
+        className: 'syntax-comment',
+        priority: 1
+      });
+    }
+
+    // Strings (priority 2)
+    const stringRegex = /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g;
+    while ((match = stringRegex.exec(escaped)) !== null) {
+      matches.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        text: match[0],
+        className: 'syntax-string',
+        priority: 2
+      });
+    }
+
+    // Annotations (priority 3)
+    const annotationRegex = /@\w+/g;
+    while ((match = annotationRegex.exec(escaped)) !== null) {
+      matches.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        text: match[0],
+        className: 'syntax-annotation',
+        priority: 3
+      });
+    }
+
+    // Keywords (priority 4)
+    const keywordRegex = /\b(public|private|protected|static|final|class|interface|extends|implements|void|int|double|float|long|short|byte|char|boolean|String|if|else|while|for|return|new|this|super|try|catch|finally|throw|throws|import|package|Stack|Character|ListNode)\b/g;
+    while ((match = keywordRegex.exec(escaped)) !== null) {
+      matches.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        text: match[0],
+        className: 'syntax-keyword',
+        priority: 4
+      });
+    }
+
+    // Functions (priority 5)
+    const functionRegex = /\b(\w+)(?=\s*\()/g;
+    while ((match = functionRegex.exec(escaped)) !== null) {
+      matches.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        text: match[0],
+        className: 'syntax-function',
+        priority: 5
+      });
+    }
+
+    // Numbers (priority 6)
+    const numberRegex = /\b\d+\.?\d*\b/g;
+    while ((match = numberRegex.exec(escaped)) !== null) {
+      matches.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        text: match[0],
+        className: 'syntax-number',
+        priority: 6
+      });
+    }
+
+    // Sort by priority (lower number = higher priority) then by start position
+    matches.sort((a, b) => {
+      if (a.priority !== b.priority) return a.priority - b.priority;
+      return a.start - b.start;
     });
 
-    return html;
+    // Remove overlapping matches (keep higher priority ones)
+    const filteredMatches: Match[] = [];
+    for (const match of matches) {
+      const overlaps = filteredMatches.some(
+        existing => !(match.end <= existing.start || match.start >= existing.end)
+      );
+      if (!overlaps) {
+        filteredMatches.push(match);
+      }
+    }
+
+    // Sort by position for building the final string
+    filteredMatches.sort((a, b) => a.start - b.start);
+
+    // Build the highlighted HTML
+    let result = '';
+    let lastIndex = 0;
+
+    for (const match of filteredMatches) {
+      // Add text before this match
+      result += escaped.substring(lastIndex, match.start);
+      // Add the highlighted match
+      result += `<span class="${match.className}">${match.text}</span>`;
+      lastIndex = match.end;
+    }
+
+    // Add remaining text
+    result += escaped.substring(lastIndex);
+
+    return result;
   };
 
   // Add line numbers to code

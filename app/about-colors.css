@@ -157,6 +157,28 @@
   text-decoration: underline;
 }
 
+/* About page section with animations */
+.about-section-with-animation {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  justify-content: space-between;
+}
+
+.about-section-text {
+  flex: 1;
+}
+
+.about-section-animation {
+  flex-shrink: 0;
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+}
+
+.about-section-animation:hover {
+  opacity: 1;
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -184,5 +206,25 @@
 
   .about-text {
     font-size: 1rem;
+  }
+
+  .about-section-with-animation {
+    flex-direction: column;
+  }
+
+  .about-section-animation {
+    order: -1;
+  }
+
+  .profile-header {
+    flex-direction: column;
+  }
+
+  .profile-header-animation {
+    display: none;
+  }
+
+  .profile-resume-viewer {
+    height: 600px;
   }
 }

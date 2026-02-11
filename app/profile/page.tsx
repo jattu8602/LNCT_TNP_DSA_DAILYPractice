@@ -1,9 +1,21 @@
 'use client';
 
-import { ExternalLink, Github, Linkedin, FileText, Globe, Code2 } from 'lucide-react';
+import { ExternalLink, Github, Linkedin, FileText, Globe, Code2, Download } from 'lucide-react';
 import Image from 'next/image';
+import Lottie from 'lottie-react';
+import { useEffect, useState } from 'react';
 
 export default function ProfilePage() {
+  const [animation, setAnimation] = useState<any>(null);
+
+  useEffect(() => {
+    // Load programming animation
+    fetch('/animations/Programming.json')
+      .then((res) => res.json())
+      .then((data) => setAnimation(data))
+      .catch(() => console.log('Animation not found'));
+  }, []);
+
   const profiles = [
     {
       name: 'Personal Website',
@@ -52,23 +64,32 @@ export default function ProfilePage() {
   return (
     <div className="page-container">
       <div className="profile-container">
-        {/* Profile Header */}
+        {/* Profile Header with Animation */}
         <div className="profile-header">
-          <div className="profile-avatar-wrapper">
-            <Image
-              src="/nitesh.jpeg"
-              alt="Nitesh Chourasiya"
-              width={120}
-              height={120}
-              className="profile-avatar"
-              priority
-            />
+          <div className="profile-header-content">
+            <div className="profile-avatar-wrapper">
+              <Image
+                src="/nitesh.jpeg"
+                alt="Nitesh Chourasiya"
+                width={120}
+                height={120}
+                className="profile-avatar"
+                priority
+              />
+            </div>
+            <h1 className="profile-title">Nitesh Chourasiya</h1>
+            <p className="profile-subtitle">Full Stack Developer | DSA Enthusiast</p>
+            <p className="profile-bio">
+              LNCT Student | Building solutions one algorithm at a time
+            </p>
           </div>
-          <h1 className="profile-title">Nitesh Chourasiya</h1>
-          <p className="profile-subtitle">Full Stack Developer | DSA Enthusiast</p>
-          <p className="profile-bio">
-            LNCT Student | Building solutions one algorithm at a time
-          </p>
+
+          {/* Programming Animation */}
+          {animation && (
+            <div className="profile-header-animation">
+              <Lottie animationData={animation} loop style={{ width: 200, height: 200 }} />
+            </div>
+          )}
         </div>
 
         {/* Profile Links */}
@@ -97,16 +118,32 @@ export default function ProfilePage() {
           })}
         </div>
 
-        {/* Resume Download */}
+        {/* Resume Viewer */}
         <div className="profile-resume-section">
-          <a
-            href="/resume_nitesh.pdf"
-            download="Nitesh_Chourasiya_Resume.pdf"
-            className="profile-resume-button"
-          >
-            <FileText className="w-5 h-5" />
-            <span>Download Resume</span>
-          </a>
+          <div className="profile-resume-header">
+            <h2 className="profile-resume-title">
+              <FileText className="w-5 h-5" />
+              Resume
+            </h2>
+            <a
+              href="/resume_nitesh.pdf"
+              download="Nitesh_Chourasiya_Resume.pdf"
+              className="profile-resume-download-btn"
+              title="Download Resume"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download</span>
+            </a>
+          </div>
+
+          {/* Embedded PDF Viewer */}
+          <div className="profile-resume-viewer">
+            <iframe
+              src="/resume_nitesh.pdf"
+              className="profile-resume-iframe"
+              title="Resume Preview"
+            />
+          </div>
         </div>
       </div>
     </div>
