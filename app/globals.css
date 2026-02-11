@@ -15,6 +15,15 @@
 /* Import pin button styles */
 @import './pin-button.css';
 
+/* Import streak page colors */
+@import './streak-colors.css';
+
+/* Import about page colors */
+@import './about-colors.css';
+
+/* Import profile page styles */
+@import './profile-styles.css';
+
 
 :root {
   --color-primary: #ff6b35;

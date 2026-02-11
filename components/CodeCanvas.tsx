@@ -27,67 +27,62 @@ export default function CodeCanvas({ file, index, isPinned, onPinToggle }: CodeC
     year: 'numeric',
   });
 
-  // Add syntax highlighting for Java code - FIXED VERSION
+  // Simplified syntax highlighting that works correctly
   const highlightJava = (line: string) => {
-    // Escape HTML first to prevent injection
-    let escaped = line
+    // Escape HTML
+    let html = line
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
 
-    // Use placeholder approach to avoid regex conflicts
-    const replacements: Array<{id: string, html: string}> = [];
-    let idCounter = 0;
+    // Store original to compare
+    const patterns = [
+      // Comments - highest priority
+      {
+        regex: /\/\/.*$/g,
+        replacement: (match: string) => `<span class="syntax-comment">${match}</span>`
+      },
+      {
+        regex: /\/\*[\s\S]*?\*\//g,
+        replacement: (match: string) => `<span class="syntax-comment">${match}</span>`
+      },
+      // Strings
+      {
+        regex: /"(?:[^"\\]|\\.)*"/g,
+        replacement: (match: string) => `<span class="syntax-string">${match}</span>`
+      },
+      {
+        regex: /'(?:[^'\\]|\\.)*'/g,
+        replacement: (match: string) => `<span class="syntax-string">${match}</span>`
+      },
+      // Annotations
+      {
+        regex: /@\w+/g,
+        replacement: (match: string) => `<span class="syntax-annotation">${match}</span>`
+      },
+      // Keywords
+      {
+        regex: /\b(public|private|protected|static|final|class|interface|extends|implements|void|int|double|float|long|short|byte|char|boolean|String|if|else|while|for|return|new|this|super|try|catch|finally|throw|throws|import|package|Stack|Character)\b/g,
+        replacement: (match: string) => `<span class="syntax-keyword">${match}</span>`
+      },
+      // Function calls (word before opening paren)
+      {
+        regex: /\b(\w+)(?=\s*\()/g,
+        replacement: (match: string) => `<span class="syntax-function">${match}</span>`
+      },
+      // Numbers
+      {
+        regex: /\b\d+\.?\d*\b/g,
+        replacement: (match: string) => `<span class="syntax-number">${match}</span>`
+      }
+    ];
 
-    // Pattern 1: Comments (highest priority - must be first)
-    escaped = escaped.replace(/(\/\/.*$|\/\*[\s\S]*?\*\/)/g, (match) => {
-      const id = `__COMMENT_${idCounter++}__`;
-      replacements.push({ id, html: `<span class="syntax-comment">${match}</span>` });
-      return id;
+    // Apply each pattern
+    patterns.forEach(({ regex, replacement }) => {
+      html = html.replace(regex, replacement);
     });
 
-    // Pattern 2: Strings
-    escaped = escaped.replace(/(["'])((?:\\.|(?!\1).)*?)\1/g, (match) => {
-      const id = `__STRING_${idCounter++}__`;
-      replacements.push({ id, html: `<span class="syntax-string">${match}</span>` });
-      return id;
-    });
-
-    // Pattern 3: Annotations
-    escaped = escaped.replace(/(@[a-zA-Z]+)/g, (match) => {
-      const id = `__ANNOTATION_${idCounter++}__`;
-      replacements.push({ id, html: `<span class="syntax-annotation">${match}</span>` });
-      return id;
-    });
-
-    // Pattern 4: Keywords
-    escaped = escaped.replace(/\b(public|private|protected|static|final|class|interface|extends|implements|void|int|double|float|long|short|byte|char|boolean|String|if|else|while|for|return|new|this|super|try|catch|finally|throw|throws|import|package|Stack)\b/g, (match) => {
-      const id = `__KEYWORD_${idCounter++}__`;
-      replacements.push({ id, html: `<span class="syntax-keyword">${match}</span>` });
-      return id;
-    });
-
-    // Pattern 5: Function calls
-    escaped = escaped.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g, (match) => {
-      const id = `__FUNCTION_${idCounter++}__`;
-      replacements.push({ id, html: `<span class="syntax-function">${match}</span>` });
-      return id;
-    });
-
-    // Pattern 6: Numbers
-    escaped = escaped.replace(/\b(\d+\.?\d*)\b/g, (match) => {
-      const id = `__NUMBER_${idCounter++}__`;
-      replacements.push({ id, html: `<span class="syntax-number">${match}</span>` });
-      return id;
-    });
-
-    // Replace all placeholders with actual HTML
-    let result = escaped;
-    replacements.forEach(({id, html}) => {
-      result = result.replace(id, html);
-    });
-
-    return result;
+    return html;
   };
 
   // Add line numbers to code

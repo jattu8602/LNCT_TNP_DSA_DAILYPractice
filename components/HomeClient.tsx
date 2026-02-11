@@ -10,6 +10,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  CarouselApi,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 
@@ -23,6 +24,7 @@ interface HomeClientProps {
 export default function HomeClient({ javaFiles, recentFiles, streak, totalSolved }: HomeClientProps) {
   const [fireAnimation, setFireAnimation] = useState(null);
   const [isPinned, setIsPinned] = useState(false);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const autoplayRef = useRef(
     Autoplay({
       delay: 10000, // 10 seconds
@@ -44,11 +46,19 @@ export default function HomeClient({ javaFiles, recentFiles, streak, totalSolved
     const autoplay = autoplayRef.current;
 
     if (!isPinned) {
-      // Pin it - stop autoplay
+      // Pin it - stop autoplay and disable scrolling
       autoplay.stop();
+      if (carouselApi) {
+        // Disable carousel dragging
+        carouselApi.plugins().scrollSnap?.destroy?.();
+      }
     } else {
-      // Unpin it - resume autoplay
+      // Unpin it - resume autoplay and enable scrolling
       autoplay.play();
+      if (carouselApi) {
+        // Re-enable carousel dragging
+        carouselApi.reInit();
+      }
     }
   };
 
@@ -61,9 +71,11 @@ export default function HomeClient({ javaFiles, recentFiles, streak, totalSolved
         opts={{
           align: "start",
           loop: true,
+          watchDrag: !isPinned, // Disable drag when pinned
         }}
         plugins={[autoplayRef.current]}
         className="home-carousel-wrapper"
+        setApi={setCarouselApi}
       >
         <CarouselContent>
           {filesToShow.map((file, index) => (
@@ -77,8 +89,22 @@ export default function HomeClient({ javaFiles, recentFiles, streak, totalSolved
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="carousel-nav-button" />
-        <CarouselNext className="carousel-nav-button" />
+        <CarouselPrevious
+          className="carousel-nav-button"
+          style={{
+            opacity: isPinned ? 0.3 : 1,
+            pointerEvents: isPinned ? 'none' : 'auto',
+            cursor: isPinned ? 'not-allowed' : 'pointer'
+          }}
+        />
+        <CarouselNext
+          className="carousel-nav-button"
+          style={{
+            opacity: isPinned ? 0.3 : 1,
+            pointerEvents: isPinned ? 'none' : 'auto',
+            cursor: isPinned ? 'not-allowed' : 'pointer'
+          }}
+        />
       </Carousel>
     </div>
   );
