@@ -2,13 +2,16 @@
 
 import { useState } from 'react';
 import { JavaFile } from '@/lib/getJavaFiles';
+import { Pin, PinOff } from 'lucide-react';
 
 interface CodeCanvasProps {
   file: JavaFile;
   index: number;
+  isPinned?: boolean;
+  onPinToggle?: () => void;
 }
 
-export default function CodeCanvas({ file, index }: CodeCanvasProps) {
+export default function CodeCanvas({ file, index, isPinned, onPinToggle }: CodeCanvasProps) {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = async () => {
@@ -24,48 +27,67 @@ export default function CodeCanvas({ file, index }: CodeCanvasProps) {
     year: 'numeric',
   });
 
-  // Add syntax highlighting for Java code
+  // Add syntax highlighting for Java code - FIXED VERSION
   const highlightJava = (line: string) => {
-    // Java keywords
-    const keywords = /\b(public|private|protected|static|final|class|interface|extends|implements|void|int|double|float|long|short|byte|char|boolean|String|if|else|while|for|return|new|this|super|try|catch|finally|throw|throws|import|package)\b/g;
+    // Escape HTML first to prevent injection
+    let escaped = line
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
 
-    // Function calls (word followed by parenthesis)
-    const functions = /\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g;
+    // Use placeholder approach to avoid regex conflicts
+    const replacements: Array<{id: string, html: string}> = [];
+    let idCounter = 0;
 
-    // Annotations
-    const annotations = /(@[a-zA-Z]+)/g;
+    // Pattern 1: Comments (highest priority - must be first)
+    escaped = escaped.replace(/(\/\/.*$|\/\*[\s\S]*?\*\/)/g, (match) => {
+      const id = `__COMMENT_${idCounter++}__`;
+      replacements.push({ id, html: `<span class="syntax-comment">${match}</span>` });
+      return id;
+    });
 
-    // Strings
-    const strings = /(["'])(.*?)\1/g;
+    // Pattern 2: Strings
+    escaped = escaped.replace(/(["'])((?:\\.|(?!\1).)*?)\1/g, (match) => {
+      const id = `__STRING_${idCounter++}__`;
+      replacements.push({ id, html: `<span class="syntax-string">${match}</span>` });
+      return id;
+    });
 
-    // Comments
-    const comments = /(\/\/.*$|\/\*[\s\S]*?\*\/)/g;
+    // Pattern 3: Annotations
+    escaped = escaped.replace(/(@[a-zA-Z]+)/g, (match) => {
+      const id = `__ANNOTATION_${idCounter++}__`;
+      replacements.push({ id, html: `<span class="syntax-annotation">${match}</span>` });
+      return id;
+    });
 
-    // Numbers
-    const numbers = /\b(\d+\.?\d*)\b/g;
+    // Pattern 4: Keywords
+    escaped = escaped.replace(/\b(public|private|protected|static|final|class|interface|extends|implements|void|int|double|float|long|short|byte|char|boolean|String|if|else|while|for|return|new|this|super|try|catch|finally|throw|throws|import|package|Stack)\b/g, (match) => {
+      const id = `__KEYWORD_${idCounter++}__`;
+      replacements.push({ id, html: `<span class="syntax-keyword">${match}</span>` });
+      return id;
+    });
 
-    // Apply highlighting
-    let highlighted = line;
+    // Pattern 5: Function calls
+    escaped = escaped.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g, (match) => {
+      const id = `__FUNCTION_${idCounter++}__`;
+      replacements.push({ id, html: `<span class="syntax-function">${match}</span>` });
+      return id;
+    });
 
-    // Comments first (highest priority)
-    highlighted = highlighted.replace(comments, '<span class="syntax-comment">$1</span>');
+    // Pattern 6: Numbers
+    escaped = escaped.replace(/\b(\d+\.?\d*)\b/g, (match) => {
+      const id = `__NUMBER_${idCounter++}__`;
+      replacements.push({ id, html: `<span class="syntax-number">${match}</span>` });
+      return id;
+    });
 
-    // Strings
-    highlighted = highlighted.replace(strings, '<span class="syntax-string">$1$2$1</span>');
+    // Replace all placeholders with actual HTML
+    let result = escaped;
+    replacements.forEach(({id, html}) => {
+      result = result.replace(id, html);
+    });
 
-    // Keywords
-    highlighted = highlighted.replace(keywords, '<span class="syntax-keyword">$1</span>');
-
-    // Annotations
-    highlighted = highlighted.replace(annotations, '<span class="syntax-annotation">$1</span>');
-
-    // Functions
-    highlighted = highlighted.replace(functions, '<span class="syntax-function">$1</span>(');
-
-    // Numbers
-    highlighted = highlighted.replace(numbers, '<span class="syntax-number">$1</span>');
-
-    return highlighted;
+    return result;
   };
 
   // Add line numbers to code
@@ -84,22 +106,21 @@ export default function CodeCanvas({ file, index }: CodeCanvasProps) {
             <p className="file-date">{formattedDate}</p>
           </div>
 
-          {/* Copy Button */}
-          <button
-            onClick={copyToClipboard}
-            className="copy-btn"
-            aria-label="Copy code"
-          >
-            {copied ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-            )}
-          </button>
+          {/* Pin/Unpin Button (only show if onPinToggle is provided) */}
+          {onPinToggle && (
+            <button
+              onClick={onPinToggle}
+              className="pin-btn cursor-pointer"
+              aria-label={isPinned ? "Unpin to resume autoplay" : "Pin to pause autoplay"}
+              title={isPinned ? "Unpin to resume autoplay" : "Pin to pause autoplay"}
+            >
+              {isPinned ? (
+                <PinOff className="w-5 h-5" />
+              ) : (
+                <Pin className="w-5 h-5" />
+              )}
+            </button>
+          )}
         </div>
 
         {/* LeetCode Question Link */}

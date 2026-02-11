@@ -49,8 +49,8 @@ export default function SideNav() {
 
           {/* Footer */}
           <div className="nav-footer">
-            <p className="text-xs text-white/40">LNCT Training & Placement</p>
-            <p className="text-xs text-white/30">© 2026</p>
+            <p className="text-xs font-semibold" style={{ color: '#e2e8f0' }}>LNCT Training & Placement</p>
+            <p className="text-xs font-medium" style={{ color: '#cbd5e0' }}>© 2026</p>
           </div>
         </div>
       </aside>

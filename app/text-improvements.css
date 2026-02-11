@@ -1,0 +1,211 @@
+/* TEXT COLOR IMPROVEMENTS - Light Theme */
+/* Add this at the end of globals.css to override dark theme text colors */
+
+/* Override section subtitle for dark text */
+.section-subtitle {
+  color: #4a5568 !important;
+  font-weight: 600 !important;
+}
+
+/* Override code canvas for light background */
+.code-canvas {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Override canvas header for light background */
+.canvas-header {
+  background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Override filename for dark text */
+.filename {
+  color: #1a202c !important;
+  font-weight: 700 !important;
+}
+
+/* Override file date for dark gray text */
+.file-date {
+  color: #4a5568 !important;
+  font-weight: 600 !important;
+}
+
+/* Override question link for better contrast */
+.question-link {
+  background: rgba(78, 205, 196, 0.15) !important;
+  color: #0d9488 !important;
+  font-weight: 600 !important;
+}
+
+/* Override code container for light background */
+.code-container {
+  background: transparent !important;
+}
+
+/* Improve syntax highlighting colors for better visibility */
+.syntax-comment {
+  color: #4a5568 !important;
+  font-style: italic !important;
+  font-weight: 500 !important;
+}
+
+.syntax-keyword {
+  color: #7c3aed !important;
+  font-weight: 700 !important;
+}
+
+.syntax-function {
+  color: #b45309 !important;
+  font-weight: 600 !important;
+}
+
+.syntax-string {
+  color: #15803d !important;
+  font-weight: 500 !important;
+}
+
+.syntax-number {
+  color: #dc2626 !important;
+  font-weight: 600 !important;
+}
+
+.syntax-annotation {
+  color: #0891b2 !important;
+  font-weight: 600 !important;
+}
+
+/* Profile page text improvements */
+.profile-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.profile-card-title {
+  color: #1a202c !important;
+  font-weight: 700 !important;
+}
+
+.profile-card-username {
+  color: #374151 !important;
+  font-weight: 600 !important;
+}
+
+.profile-card-stats {
+  color: #4a5568 !important;
+  font-weight: 500 !important;
+}
+
+/* Streak page text improvements */
+.streak-stat-label {
+  color: #374151 !important;
+  font-weight: 700 !important;
+}
+
+.streak-stat-value {
+  color: #1a202c !important;
+  font-weight: 800 !important;
+}
+
+.streak-quote-text {
+  color: #1f2937 !important;
+  font-weight: 600 !important;
+}
+
+.streak-quote-author {
+  color: #4a5568 !important;
+  font-weight: 600 !important;
+}
+
+/* About page text improvements */
+.about-section h2 {
+  color: #1a202c !important;
+  font-weight: 700 !important;
+}
+
+.about-section p {
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+.topic-badge {
+  background: rgba(102, 126, 234, 0.1) !important;
+  color: #4338ca !important;
+  border: 1px solid rgba(102, 126, 234, 0.2) !important;
+  font-weight: 600 !important;
+}
+
+/* Navigation improvements */
+.nav-link {
+  color: #374151 !important;
+  font-weight: 600 !important;
+}
+
+.nav-link.active {
+  color: #5a67d8 !important;
+  font-weight: 700 !important;
+}
+
+/* Empty state text */
+.empty-title {
+  color: #1a202c !important;
+  font-weight: 700 !important;
+}
+
+.empty-description {
+  color: #4a5568 !important;
+  font-weight: 500 !important;
+}
+
+/* Footer label improvements */
+.footer-label {
+  color: #4a5568 !important;
+  font-weight: 600 !important;
+}
+
+/* Button text improvements */
+button {
+  font-weight: 600 !important;
+}
+
+/* Ensure all headings are dark */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #1a202c !important;
+  font-weight: 700 !important;
+}
+
+/* Ensure all body text is readable */
+p {
+  color: #374151 !important;
+  font-weight: 500;
+}
+
+/* Link colors for better readability */
+a {
+  color: #4338ca !important;
+  font-weight: 600 !important;
+}
+
+a:hover {
+  color: #5a67d8 !important;
+}
+
+/* Line numbers - make them more visible */
+.line-number,
+.line-number-white {
+  color: #6b7280 !important;
+  font-weight: 600 !important;
+}
+
+/* Make all code text more visible */
+.line-content {
+  color: #1f2937 !important;
+  font-weight: 500 !important;
+}
