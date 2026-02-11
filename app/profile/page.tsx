@@ -56,7 +56,7 @@ export default function ProfilePage() {
         <div className="profile-header">
           <div className="profile-avatar-wrapper">
             <Image
-              src="https://github.com/jattu8602.png"
+              src="/nitesh.jpeg"
               alt="Nitesh Chourasiya"
               width={120}
               height={120}
