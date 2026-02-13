@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 
 export interface JavaFile {
   filename: string;
@@ -37,7 +38,22 @@ export async function getJavaFiles(): Promise<JavaFile[]> {
         scanDirectory(fullPath);
       } else if (entry.isFile() && entry.name.endsWith('.java')) {
         const content = fs.readFileSync(fullPath, 'utf-8');
-        const stats = fs.statSync(fullPath);
+
+        // Get the last commit date for this file using Git
+        let dateModified: string;
+        try {
+          // Get the Unix timestamp of the last commit that modified this file
+          const gitDate = execSync(
+            `git log -1 --format=%cI "${fullPath}"`,
+            { encoding: 'utf-8', cwd: process.cwd() }
+          ).trim();
+
+          dateModified = gitDate || new Date().toISOString();
+        } catch (error) {
+          // Fallback to file system modification time if git command fails
+          const stats = fs.statSync(fullPath);
+          dateModified = stats.mtime.toISOString();
+        }
 
         // Extract all links from the file (looking for https:// URLs)
         const linkRegex = /https?:\/\/[^\s\)]+/g;
@@ -52,7 +68,7 @@ export async function getJavaFiles(): Promise<JavaFile[]> {
           content,
           questionLink,
           links,
-          dateModified: stats.mtime.toISOString(),
+          dateModified,
           relativePath: path.relative(javaDirectory, fullPath),
         });
       }
