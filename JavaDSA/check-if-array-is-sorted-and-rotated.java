@@ -18,3 +18,10 @@ class Solution {
 
     }
 }
+
+//  static inner class  -
+// inner class -
+//  this  keyword usage
+//  hybrid , multilevel , nultiple , single , hirearchical inheritance
+//  variable , methods ,  constructors , blocks , inner class
+// what is inheritance ? - one class can aquire all the properties of another class is known as inheritance 
