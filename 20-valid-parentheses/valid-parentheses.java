@@ -1,28 +1,31 @@
 class Solution {
     public boolean isValid(String s) {
-        Stack<Character> st = new Stack<>();
+        // valid parenthsis in my way 
+        Stack <Character> st = new Stack<>();
 
-        for(int i = 0 ; i <s.length();i++){
-            char c = s.charAt(i);
-            // push into the stack 
-            if(c=='(' || c=='{' || c=='['){
-                st.push(c);
+        for(char ch : s.toCharArray())
+        {
+            if(ch=='(' || ch=='{' || ch=='['){
+                st.push(ch);
+
             }
-            // remove from stack 
+            // on removal 
             else{
-                if(st.isEmpty()){
+                if(st.isEmpty())return false;
+                else if(
+                    ch==')' && st.peek()=='(' ||
+                    ch=='}' && st.peek()=='{' ||
+                    ch==']' && st.peek()=='[' 
+                ){
+                    st.pop();
+
+                }else{
                     return false;
                 }
-                    char top = st.pop();
-                    if(c==')' && top!='(' ||
-                       c=='}' && top!='{' ||
-                       c==']' && top!='['  )return false;
-                
 
             }
         }
         return st.isEmpty();
-
         
     }
     
