@@ -3,11 +3,8 @@ class Solution {
         List<List<Integer>> ans = new ArrayList<>();
         solve(0 , nums , ans );
         return ans;
-        
-        
-
     }
-    public void swap(int a , int b , int[] arr){
+    public void swap(int a, int b , int[] arr){
         int temp = arr[a];
         arr[a] = arr[b];
         arr[b] = temp;
@@ -18,17 +15,19 @@ class Solution {
             List<Integer> ds = new ArrayList<>();
             for(int i = 0;i<nums.length;i++){
                 ds.add(nums[i]);
+
             }
             ans.add(new ArrayList<>(ds));
             return;
-        }
-        for (int i = idx ; i<nums.length;i++){
-            swap(i , idx, nums);
-            solve(idx+1,nums, ans);
-            swap(i , idx, nums);
 
         }
+        for(int i = idx;i<nums.length;i++)
+        {
+            swap(idx , i , nums);
+            solve(idx+1,nums ,ans);
+            swap(idx, i , nums);
+
+        }
+
     }
-    
-  
 }
