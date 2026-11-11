@@ -4,60 +4,41 @@ class Solution {
         char[][] board = new char[n][n];
         for(int col = 0 ; col<n;col++){
             Arrays.fill(board[col],'.');
+
         }
-        solve(0, board, ans, n);
+        boolean[] col = new boolean[n];
+        boolean[] diag = new boolean[n*2];
+        boolean[] antiDiag = new boolean[n*2];
+        solve(0, board, ans , n, col , diag, antiDiag);
         return ans;
-    }
-    public void solve(int row, char[][] board, List<List<String>> ans , int n){
+      }
+      public void solve(int row, char[][] board, List<List<String>> ans, int n, boolean[] col, boolean[] diag, boolean[] antiDiag){
         if(row==n){
             List<String> temp = new ArrayList<>();
-            for(int col = 0 ; col<n;col++){
-                temp.add(new String(board[col]));
+            for(int c = 0 ;c<n;c++){
+                temp.add(new String(board[c]));
             }
             ans.add(temp);
             return;
         }
-        for(int col = 0 ;col<n;col++){
-            if(isSafe(row, col ,board, n)){
-                board[row][col] = 'Q';
-                solve(row+1, board, ans , n);
-                board[row][col]='.';
-            }
-        }
-       
+        for(int c = 0 ;c<n;c++){
+            if(col[c] || diag[row+c] || antiDiag[row-c+n])continue;
 
-    }
-    public boolean isSafe(int row, int col , char[][] board, int n){
-        // check coloumn wise
-        for(int i = row-1;i>=0;i--){
-            if(board[i][col]=='Q')return false;
+            // put the col , diag , antiDiag
+            col[c]= true;
+            diag[row+c] = true;
+            antiDiag[row-c+n]= true;
 
-        }
+            board[row][c] = 'Q';
+            solve(row+1, board, ans, n , col , diag, antiDiag);
+            board[row][c] = '.';
+            col[c] = false;
+            diag[row+c] = false;
+            antiDiag[row-c+n] = false;
 
-        // check top left
-        int r = row-1;
-        int c = col-1;
-        while(r>=0 && c>=0){
-            if(board[r][c]=='Q')return false;
-            r--;
-            c--;
 
-        }
-
-        // check top right 
-        r= row-1;
-        c= col+1;
-        while(r>=0 && c<n){
-            if(board[r][c]=='Q')return false;
-            r--;
-            c++;
+        
             
         }
-
-        return true;
-
-
-
-
-    }
+      }
 }
