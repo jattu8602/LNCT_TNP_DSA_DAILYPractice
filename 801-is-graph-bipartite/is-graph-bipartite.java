@@ -6,10 +6,7 @@ class Solution {
         for(int i = 0 ; i<V;i++){
             if(color[i]==-1){
                 if(bfs(i , V , graph , color)==false){
-                    return false;
-
-
-                }
+                    return false; }
             }
         }
         return true;
