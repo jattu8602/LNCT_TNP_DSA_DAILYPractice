@@ -2,31 +2,29 @@ class Solution {
     public boolean isBipartite(int[][] graph) {
         int V = graph.length;
         int[] color = new int[V];
-        for(int i = 0 ; i<V;i++)color[i]=-1;
+        for(int i = 0 ; i<V;i++)color[i] = -1;
         for(int i = 0 ; i<V;i++){
             if(color[i]==-1){
-                if(bfs(i , V , graph , color)==false){
-                    return false; }
-            }
-        }
-        return true;
-    }
-    public boolean bfs(int start, int V, int[][] graph , int[] color){
-        color[start] = 0 ; 
-        Queue<Integer> q  = new LinkedList<>();
-        q.add(start);
-        while(!q.isEmpty()){
-            int node = q.peek();
-            q.remove();
-            for(int it : graph[node]){
-                if(color[it]==-1){
-                    color[it] = 1-color[node];
-                    q.add(it);
-                }else if(color[it]==color[node]){
+                if(!dfs(i , 0 ,graph , color )){
                     return false;
                 }
             }
         }
         return true;
+
     }
+    public boolean dfs(int i , int col , int[][] graph , int[] color){
+        color[i] = col;
+        for(int itr: graph[i]){
+            if(color[itr]==-1){
+                if(!dfs(itr, 1-col,graph , color)){
+                    return false;
+                }
+            }else if(color[itr]==col){
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
